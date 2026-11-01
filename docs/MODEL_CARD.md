@@ -1,52 +1,51 @@
-# Model Card: Chest X-ray Pneumonia Classifier
+# Model Card: Pneumonia Detection CNN
 
-## Summary
+## What this model does
 
-A TensorFlow/Keras convolutional neural network packaged as `best_cnn_model.h5`. The Streamlit application uses the model for binary chest X-ray classification and displays **Pneumonia** or **No Pneumonia**.
+I trained and saved a CNN model in `best_cnn_model.h5` for a chest X-ray classification project. The application uses it to classify an uploaded image as **Pneumonia** or **No Pneumonia**.
 
-## Verified deployment details
+## Model details
 
-- Input shape: `128 × 128 × 1` (grayscale).
-- Output: one sigmoid value.
-- App preprocessing: grayscale conversion, resize to model input dimensions, and pixel scaling by `1/255`.
-- App decision threshold: `0.45`.
-- Positive-class interpretation in the app: values at or above the threshold are labeled Pneumonia.
+From the saved model file, I confirmed the following:
 
-These are deployment facts, not proof that the class mapping or threshold is scientifically optimal. Verify both against the original training and validation pipeline.
+- Input shape: `128 × 128 × 1` (grayscale image).
+- Output layer: one sigmoid value.
+- Layers: two convolution and max-pooling blocks, followed by a flatten layer, a dense layer, dropout and the final sigmoid output.
+- Threshold currently used in the app: `0.45`.
+
+For prediction, my app converts the image to grayscale, resizes it to the model's input dimensions and scales pixel values by `1/255`. I still need to compare this preprocessing and the positive-class mapping with my original training notebook to make sure they match exactly.
 
 ## Intended use
 
-Educational experimentation and demonstration of a computer-vision inference workflow only.
+I built this model as a learning and portfolio project to practise image classification and deploy a trained CNN through Streamlit.
 
-## Out-of-scope use
+It is not intended for clinical diagnosis, patient triage or treatment decisions.
 
-- Clinical diagnosis or exclusion of pneumonia.
-- Patient triage or treatment decisions.
-- Autonomous interpretation of medical images.
-- Any claim of clinical performance without appropriate validation and governance.
+## Dataset and evaluation
 
-## Training data and evaluation
+I still need to add the dataset source, licensing details, dataset split and class mapping from my original project records. I also need to evaluate the saved model on a separate test set before publishing performance metrics.
 
-Dataset provenance, licensing, cohort composition, data split methodology, class-index mapping and held-out test metrics were not documented in the deployed repository reviewed for this update. They must be supplied from the original research records. Do not infer or fabricate these details.
+I have not included accuracy, precision, recall, F1-score, sensitivity, specificity or ROC-AUC here because I have not yet verified those results against the actual evaluation output.
 
-## Known limitations and risks
+## Current limitations
 
-- Distribution shift across hospitals, scanners, populations and acquisition protocols may affect predictions.
-- The sigmoid output is not necessarily a calibrated probability.
-- A threshold of 0.45 requires validation-based justification.
-- DICOM pixel interpretation may require modality-specific rescaling and windowing.
-- PDF page selection can introduce non-X-ray content into the model.
-- The model has not been established as clinically validated.
+- I need to confirm that the model's sigmoid output represents the Pneumonia class.
+- The `0.45` threshold is the value currently set in the app; it has not been justified here using a documented validation analysis.
+- A sigmoid output should not automatically be treated as a calibrated medical probability.
+- Model performance may change when images come from different hospitals, scanners or patient populations.
+- DICOM images may need modality-specific rescaling and windowing. The current image conversion should be tested with representative DICOM files.
+- For PDF uploads, the user has to select a page that actually contains a chest X-ray.
+- I have not established this model as clinically validated.
 
-## Validation checklist
+## Work still to do
 
-1. Verify that the sigmoid-positive class is Pneumonia.
-2. Confirm that inference preprocessing exactly matches training preprocessing.
-3. Document the validation procedure used to select the threshold.
-4. Evaluate on a held-out, leakage-aware test set.
-5. Report confusion matrix, per-class precision/recall/F1, sensitivity, specificity, and ROC-AUC where appropriate.
-6. Document dataset source, license, cohort limitations and intended population.
+1. Check the model's class order against the training notebook.
+2. Confirm that inference preprocessing matches the training pipeline.
+3. Evaluate the model on a separate test set.
+4. Add a confusion matrix and relevant classification metrics.
+5. Review the threshold using validation results.
+6. Record the dataset source, license and any relevant acknowledgements.
 
-## Safety statement
+## Medical disclaimer
 
-This model is a research/educational artifact only. Its predictions must not be used to make decisions about patient care. Clinical use would require appropriate expert oversight, external validation, governance and regulatory review.
+This is an educational project, not a medical device. Its predictions should not be used to diagnose or rule out pneumonia or to make healthcare decisions. Anyone with health concerns should consult a qualified healthcare professional.

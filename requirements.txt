@@ -1,0 +1,9 @@
+streamlit
+tensorflow
+numpy
+pydicom
+Pillow
+pymupdf
+pillow-heif
+
+

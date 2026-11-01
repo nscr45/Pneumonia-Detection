@@ -157,4 +157,4 @@ This project is for learning and demonstration. A model output is not a diagnosi
 
 ## License and dataset details
 
-I still need to confirm the original dataset source, its terms of use and the appropriate project license before adding those details here.
+I received the chest X-ray dataset from my postgraduate programme for my final project. I used it to develop and work on the CNN-based pneumonia classification model. I still need to confirm the dataset's original source and whether its terms allow me to redistribute it publicly before adding a dataset citation or sharing the data in this repository.

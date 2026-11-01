@@ -10,78 +10,120 @@ tags:
   - tensorflow
   - computer-vision
   - medical-imaging
-short_description: CNN-based chest X-ray classification research demo
+short_description: My chest X-ray pneumonia classification project
 ---
 
-# Pneumonia Detection from Chest X-rays
+# Pneumonia Detection using CNN
 
-A deep-learning research application that classifies chest X-ray images into **Pneumonia** and **No Pneumonia** categories using a convolutional neural network (CNN). The project combines a TensorFlow/Keras inference pipeline with a Streamlit interface for reviewing and analyzing medical images.
+I built this project to explore how deep learning can be used to classify chest X-ray images. The model predicts whether an uploaded image belongs to the **Pneumonia** or **No Pneumonia** class. I also built a Streamlit application so the model can be used through a simple interface instead of running predictions directly from a notebook.
 
-> **Medical disclaimer:** This is an educational/research prototype, not a medical device or clinically validated diagnostic system. Do not use its predictions to diagnose, rule out disease, make triage decisions, or guide treatment. All medical decisions must be made by qualified healthcare professionals.
+This is a learning and portfolio project. It is not a medical diagnostic tool, and its predictions should not be used to make decisions about anyone's health.
 
-## Project overview
+## What the application can do
 
-The application accepts individual or batch uploads, decodes supported image formats, preprocesses each image to match the loaded model's input shape, and displays the original image alongside its classification output.
+- Upload and analyse multiple files in one batch (up to 10 files).
+- Preview each uploaded image before running the model.
+- Display the prediction and model output alongside the corresponding image.
+- Read common image formats such as JPG, JPEG, PNG, WEBP, BMP, TIFF, GIF, HEIC and HEIF.
+- Accept DICOM files (`.dcm` and `.dicom`).
+- Read PDF files and let the user choose which page to analyse.
+- Show progress and report errors for files that could not be processed.
 
-| Component | Implementation |
+## Tools and libraries
+
+| Tool | How I used it |
 |---|---|
-| Task | Binary chest X-ray image classification |
-| Model framework | TensorFlow / Keras |
-| Model artifact | `best_cnn_model.h5` |
-| Interface | Streamlit |
-| Image processing | Pillow, NumPy |
-| DICOM support | pydicom |
-| PDF rendering | PyMuPDF |
-| Optional HEIC/HEIF | pillow-heif |
-| Container | Docker |
-| Deployment target | Hugging Face Spaces |
+| Python | Main programming language |
+| TensorFlow / Keras | Loading and running the CNN model |
+| Streamlit | Building the web interface |
+| NumPy | Preparing image arrays |
+| Pillow | Image conversion and resizing |
+| pydicom | Reading DICOM images |
+| PyMuPDF | Rendering PDF pages |
+| pillow-heif | Supporting HEIC and HEIF images |
+| Docker | Packaging the application |
+| Hugging Face Spaces | Hosting the application |
 
-## Features
+## How a prediction works
 
-- Batch upload and inference for up to 10 files per batch.
-- Side-by-side display of each uploaded image and its corresponding result.
-- Support for JPG, JPEG, JPE, PNG, WEBP, BMP, TIFF, GIF, HEIC and HEIF.
-- DICOM decoding for `.dcm` and `.dicom` files.
-- PDF page rendering, with page selection for multi-page documents.
-- Model-input-aware resizing and channel handling.
-- Streamlit dashboard with upload review, progress feedback and per-file error reporting.
-- Docker-based deployment configuration for Hugging Face Spaces.
-
-## Inference workflow
+1. I upload an image, DICOM file or PDF.
+2. The app reads the file and converts it into an image.
+3. The image is converted to grayscale and resized to the model's input dimensions.
+4. Pixel values are scaled between 0 and 1.
+5. The processed image is passed to the trained CNN.
+6. The app displays the model output and the predicted class.
 
 ```mermaid
 flowchart TD
-    A[Upload image / DICOM / PDF] --> B[Decode image or render PDF page]
+    A[Upload image, DICOM or PDF] --> B[Read or render image]
     B --> C[Convert to grayscale]
-    C --> D[Resize to model input dimensions]
-    D --> E[Normalize pixel values]
-    E --> F[TensorFlow / Keras CNN]
-    F --> G[Single sigmoid output]
-    G --> H{Output >= 0.45?}
-    H -->|Yes| I[Pneumonia]
-    H -->|No| J[No Pneumonia]
-    I --> K[Display image and result]
-    J --> K
+    C --> D[Resize to 128 x 128]
+    D --> E[Scale pixel values]
+    E --> F[Trained CNN model]
+    F --> G[Prediction output]
+    G --> H[Show result in Streamlit]
 ```
 
-## Model and preprocessing
+## About the model
 
-The deployed application loads `best_cnn_model.h5` and reads the model's input dimensions at runtime. The supplied model artifact was inspected as a grayscale image model with an input shape of **128 × 128 × 1** and a single sigmoid output.
+The model file included in this repository is `best_cnn_model.h5`. I inspected the saved model and confirmed that it accepts grayscale images with an input shape of **128 × 128 × 1** and returns a single sigmoid output.
 
-The application preprocessing currently:
-1. Decodes the uploaded image (or renders the selected PDF page).
-2. Converts it to grayscale.
-3. Resizes it to the dimensions expected by the model.
-4. Converts pixel values to floating point and divides by 255.
-5. Adds the batch dimension and predicts with the Keras model.
+The current application uses **0.45** as its classification threshold:
 
-The current app uses a decision threshold of **0.45** and interprets outputs at or above this threshold as **Pneumonia**. Confirm that the positive class mapping, preprocessing and threshold exactly match the original training and validation pipeline before making scientific claims.
+- Output of 0.45 or higher: Pneumonia
+- Output below 0.45: No Pneumonia
 
-### Evaluation results
+This is how the current app is configured. The class mapping, preprocessing and threshold still need to be checked against the original training notebook and evaluation results before treating the output as a reliable measure of model performance.
 
-No verified held-out test metrics were available in the deployed repository at the time of this update. Accuracy, precision, recall, F1-score, sensitivity, specificity and ROC-AUC are therefore intentionally not stated. Add these values only from a reproducible, leakage-aware evaluation on a separate test set.
+## Run it on your computer
 
-## Repository structure
+You will need Python 3.10 and the project files.
+
+**1. Clone the repository**
+
+```bash
+git clone https://github.com/nscr45/Pneumonia-Detection.git
+cd Pneumonia-Detection
+```
+
+**2. Create and activate a virtual environment**
+
+Windows PowerShell:
+
+```powershell
+py -3.10 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+
+macOS / Linux:
+
+```bash
+python3.10 -m venv .venv
+source .venv/bin/activate
+```
+
+**3. Install the libraries and start the app**
+
+```bash
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+Streamlit will print a local address in the terminal. Open it in your browser, usually at `http://localhost:8501`.
+
+## Run using Docker
+
+If you prefer Docker, build and start the application with:
+
+```bash
+docker build -t pneumonia-detection .
+docker run --rm -p 8501:8501 pneumonia-detection
+```
+
+Then open `http://localhost:8501`.
+
+## Project structure
 
 ```text
 Pneumonia-Detection/
@@ -96,80 +138,23 @@ Pneumonia-Detection/
     └── MODEL_CARD.md
 ```
 
-## Run locally
+## What I want to improve next
 
-### 1. Clone
+There are a few things I would like to work on next:
 
-```bash
-git clone https://github.com/nscr45/Pneumonia-Detection.git
-cd Pneumonia-Detection
-```
+- Evaluate the model on a separate test set and report the confusion matrix, precision, recall, F1-score, sensitivity, specificity and ROC-AUC.
+- Add plots showing training and validation performance.
+- Check that the preprocessing and class mapping in the app match the original training code.
+- Test the DICOM pipeline with different image types and metadata.
+- Add automated tests for image loading and prediction.
+- Improve the app based on testing with different valid and invalid uploads.
 
-### 2. Create a virtual environment
+I have not added accuracy or other performance numbers here because I do not want to publish metrics without verifying them against the actual evaluation results.
 
-**Windows PowerShell**
+## A note on medical use
 
-```powershell
-py -3.10 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-```
+This project is for learning and demonstration. A model output is not a diagnosis, and a sigmoid score should not automatically be interpreted as a clinically meaningful probability. The model has not been established as clinically validated. Please do not use it to make healthcare or treatment decisions.
 
-**macOS / Linux**
+## License and dataset details
 
-```bash
-python3.10 -m venv .venv
-source .venv/bin/activate
-```
-
-### 3. Install dependencies and launch
-
-```bash
-python -m pip install --upgrade pip
-pip install -r requirements.txt
-streamlit run app.py
-```
-
-Open the local URL printed by Streamlit, normally `http://localhost:8501`.
-
-## Run with Docker
-
-```bash
-docker build -t pneumonia-detection .
-docker run --rm -p 8501:8501 pneumonia-detection
-```
-
-Then open `http://localhost:8501`.
-
-## Hugging Face Spaces deployment
-
-This repository uses the Docker SDK configuration and exposes Streamlit on port **8501**.
-
-1. Create or open a Docker-based Hugging Face Space.
-2. Ensure `app.py`, `requirements.txt`, `Dockerfile`, `.streamlit/config.toml` (if used), and `best_cnn_model.h5` are present.
-3. Ensure the model artifact is tracked correctly with Git LFS.
-4. Review the Space build and runtime logs after pushing changes.
-
-The app searches for the model in the repository root first, under the filename `best_cnn_model.h5`.
-
-## Responsible use and limitations
-
-- This model is an educational research artifact and has not been established as clinically validated.
-- A sigmoid score is not necessarily a calibrated clinical probability.
-- The threshold and class mapping must be justified using validation data and documented.
-- Model performance may vary across hospitals, scanners, patient populations, image acquisition protocols and image quality.
-- DICOM pixel values can require modality-specific rescale and windowing. Validate DICOM handling against representative source files.
-- PDF input is rendered page-by-page; users must select a page containing a suitable chest X-ray.
-- Do not upload identifiable patient data to public services or repositories.
-
-## Future improvements
-
-- Add a reproducible training/evaluation notebook and document dataset provenance and licensing.
-- Publish a held-out evaluation report with confusion matrix and per-class metrics.
-- Add threshold analysis and calibration assessment.
-- Expand DICOM handling tests for modality transforms, windowing and multi-frame studies.
-- Add automated tests for image decoding, preprocessing and prediction-output validation.
-- Add CI checks for syntax, dependency installation and app smoke tests.
-
-## License and attribution
-
-No explicit open-source license or dataset attribution was included in the repository content reviewed for this update. Add the appropriate license and dataset/research acknowledgements only after confirming the original source terms.
+I still need to confirm the original dataset source, its terms of use and the appropriate project license before adding those details here.
